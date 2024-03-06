@@ -1,0 +1,30 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+
+- script: pip install databricks-cli
+  displayName: 'Install Databricks CLI'
+
+- script: |
+    databricks configure --token
+    databricks configure --profile $(profileName) --token
+  displayName: 'Create Databricks CLI Profile'
+
+- script: databricks workspace import_dir --profile $(profileName) --path / --overwrite
+  displayName: 'Import Notebooks to Databricks Workspace'
+
+trigger: none
+
+pr: 
+  branches:
+    include:
+      - master
+  trigger: 
+    branches:
+      include:
+        - master
+    batch: true
